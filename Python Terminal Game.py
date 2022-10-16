@@ -74,6 +74,7 @@ class Player:
         continue
       if choice == "rest":
         input("You calmly took a breath")
+        input(("You've been fully restored to {} health").format(self.max_health))
         self.health = self.max_health
         loot_or_rest = 2
       if choice == "loot":
@@ -158,12 +159,18 @@ current_weapon_type = weapon_types.get(player.weapon)
 input()
 fight_question = input("Ready to pick a fight?\nY/N:\n")
 
-if fight_question.lower() == "y":
-  print("Great! I see some losers over there, let's go.")
-  input("Press Enter to continue")
-if fight_question.lower() == "n":
-  print("Too bad. Should have thought about that before running this program. Let's go.")
-  input("Press Enter to continue")
+while True:
+    if fight_question.lower() not in ("y", "n", "yes", "no"):
+        fight_question = input("Not an option\nYes or no?\n")
+        continue
+    if fight_question.lower() == "y" or "yes":
+        print("Great! I see some losers over there, let's go.")
+        input()
+        break
+    if fight_question.lower() == "n" or "no":
+        print("Too bad. Should have thought about that before running this program. Let's go.")
+        input()
+        break
 
 battle_count = 0
 
@@ -172,30 +179,36 @@ def battle(player, battle_count):
   enemy = Monster(random.choice(list((role_types.keys()))), player.level, random.choice(list((special_qualities))))
 
   def attack_sequence(player, enemy):
-      if enemy.health <= 0:
-        print("You won! I haven't added exp yet, but it'll get there!")
-        return player, enemy
-      elif enemy.special == "superduper fast":
+    #   if enemy.health <= 0:
+    #     print("You won! I haven't added exp yet, but it'll get there!")
+    #     return player, enemy
+      if enemy.special == "superduper fast":
         bad = round(enemy.attack(player))
         player.health -= bad
         if player.health <= 0:
           return "You lose"
         else:
-          print(("It's wicked fast! You lost {} health.\nYou have {} health remaining.").format(bad, player.health))
+          print(("\nIt's wicked fast! You lost {} health.\nYou have {} health remaining.").format(bad, player.health))
+          input()
         good = round(player.attack(enemy))
         enemy.health -= good
         print(("You damaged the {} for {} health.\nThey have {} health remaining.").format(enemy.role, good, enemy.health))
+        input()
         return player, enemy
       else:
         good = round(player.attack(enemy))
         enemy.health -= good
-        print(("You damaged the {} for {} health.\nThey have {} health remaining.").format(enemy.role, good, enemy.health))
+        print(("\nYou damaged the {} for {} health.\nThey have {} health remaining.").format(enemy.role, good, enemy.health))
+        input()
         bad = round(enemy.attack(player))
         player.health -= bad
         if player.health <= 0:
-          return "You lose"
+            return "You lose"
+        if enemy.health <= 0:
+            return player, enemy
         else:
           print(("It attacked! You lost {} health.\nYou have {} health remaining.").format(bad, player.health))
+          input()
         return player, enemy
       return player, enemy
   input(enemy)
