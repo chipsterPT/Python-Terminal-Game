@@ -85,12 +85,12 @@ class Player:
           if weapon_choice not in ("y","n","yes","no"):
             weapon_choice = input("Just looking for yes or no, dude.  ").lower()
             continue
-          if weapon_choice == "y" or "yes":
+          if weapon_choice in ("y", "yes"):
             self.weapon = possible_weapon
             input(("You look bitchin with your new {}! Let's try it out.").format(self.weapon))
             loot_or_rest = 2
             break
-          if weapon_choice == "n" or "no":
+          if weapon_choice in ("n", "no"):
             input(("Good call, you look better with your {} anyway. Let's continue.").format(self.weapon))
             loot_or_rest = 2
             break
@@ -163,11 +163,11 @@ while True:
     if fight_question.lower() not in ("y", "n", "yes", "no"):
         fight_question = input("Not an option\nYes or no?\n")
         continue
-    if fight_question.lower() == "y" or "yes":
+    if fight_question.lower() in ("y", "yes"):
         print("Great! I see some losers over there, let's go.")
         input()
         break
-    if fight_question.lower() == "n" or "no":
+    if fight_question.lower() in ("n", "no"):
         print("Too bad. Should have thought about that before running this program. Let's go.")
         input()
         break
@@ -216,7 +216,7 @@ def battle(player, battle_count):
   while enemy.health > 0:
     atk_or_run = input("Attack or run?\n").lower()
     if atk_or_run not in ("attack", "run"):
-      atk_or_run = input("Try again.\nAttack or run?\n")
+      input("Try again.\n")
       continue
     if atk_or_run == "attack":
       attack_sequence(player, enemy)
