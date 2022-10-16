@@ -179,9 +179,6 @@ def battle(player, battle_count):
   enemy = Monster(random.choice(list((role_types.keys()))), player.level, random.choice(list((special_qualities))))
 
   def attack_sequence(player, enemy):
-    #   if enemy.health <= 0:
-    #     print("You won! I haven't added exp yet, but it'll get there!")
-    #     return player, enemy
       if enemy.special == "superduper fast":
         bad = round(enemy.attack(player))
         player.health -= bad
@@ -216,7 +213,7 @@ def battle(player, battle_count):
   while enemy.health > 0:
     atk_or_run = input("Attack or run?\n").lower()
     if atk_or_run not in ("attack", "run"):
-      input("Try again.\n")
+      print("Try again.\n")
       continue
     if atk_or_run == "attack":
       attack_sequence(player, enemy)
@@ -230,6 +227,6 @@ def battle(player, battle_count):
     player.loot(enemy)
     play_again = input(("You've had {} battle(s)\nDo you want to play again?").format(battle_count))
   else:
-    return "Didn't get here yet"
+    print("Didn't get here yet")
 
 battle(player,battle_count)
