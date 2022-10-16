@@ -97,8 +97,6 @@ class Player:
         choice = "done"
       if choice == "done":
         break
-  #def run_away(self):
-    #guaranteed
 
 class Monster:
   def __init__(self, role, level, special):
@@ -134,7 +132,7 @@ class Monster:
   
   #def poison(self, player):
 
-  #def gloat(self):
+  #def heal(self):
     
 player_name = input("Enter player name, then hit Enter.\n")
 
@@ -171,8 +169,6 @@ while True:
         print("Too bad. Should have thought about that before running this program. Let's go.")
         input()
         break
-
-battle_count = 0
 
 def battle(player, battle_count):
   battle_count += 1
@@ -225,8 +221,28 @@ def battle(player, battle_count):
   if enemy.health <= 0:
     input("Damn fine fightin'")
     player.loot(enemy)
-    play_again = input(("You've had {} battle(s)\nDo you want to play again?").format(battle_count))
+    while True:
+        play_again = input(("You've had {} battle(s)\nDo you want to play again?").format(battle_count))
+        if play_again not in ("y","n","yes","no"):
+            print("What was that? I can't hear incorrect inputs\n")
+            continue
+        else:
+            break
+    return player, play_again, battle_count
   else:
     print("Didn't get here yet")
 
-battle(player,battle_count)
+battle_count = 0
+play_again = "y"
+
+while battle_count < 3:
+    if play_again in ("y","yes"):
+        battle(player,battle_count)
+    if play_again in ("n","no"):
+        break
+input("All done already?")
+
+#battle_count doesn't increment
+#play_again isn't returned/evaluated
+#advantage may be broken
+#exp and limit on battles/some sort of endgame needed
