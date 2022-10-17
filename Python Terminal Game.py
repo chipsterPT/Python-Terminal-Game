@@ -49,18 +49,9 @@ class Player:
       advantage+=1
     if current_weapon_type == "mage" and enemy.role == "archer":
       advantage+=1
-    # Weapon v role disadvantage
-    if current_weapon_type == "warrior" and enemy.role == "archer":
-      advantage = advantage * .75
-    if current_weapon_type == "archer" and enemy.role == "mage":
-      advantage = advantage * .75
-    if current_weapon_type == "mage" and enemy.role == "warrior":
-      advantage = advantage * .75
     # Role and weapon compatibility
-    if current_weapon_type == self.role:
+    if role_types.get(self.role) in current_weapon_type:
       advantage+=1
-    if self.role != current_weapon_type:
-      advantage = advantage * .80
     # Attack power result
     attack_power = self.level * advantage
     return attack_power
@@ -244,5 +235,4 @@ while battle_count < 3:
 input("All done already?")
 
 
-#advantage may be broken
 #exp and limit on battles/some sort of endgame needed
