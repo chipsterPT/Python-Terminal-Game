@@ -170,8 +170,7 @@ while True:
         input()
         break
 
-def battle(player, battle_count):
-  battle_count += 1
+def battle(player):
   enemy = Monster(random.choice(list((role_types.keys()))), player.level, random.choice(list((special_qualities))))
 
   def attack_sequence(player, enemy):
@@ -237,12 +236,13 @@ play_again = "y"
 
 while battle_count < 3:
     if play_again in ("y","yes"):
-        battle(player,battle_count)
+        battle_count += 1
+        battle(player)
+        continue
     if play_again in ("n","no"):
         break
 input("All done already?")
 
-#battle_count doesn't increment
-#play_again isn't returned/evaluated
+
 #advantage may be broken
 #exp and limit on battles/some sort of endgame needed
