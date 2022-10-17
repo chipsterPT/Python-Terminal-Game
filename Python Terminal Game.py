@@ -211,27 +211,28 @@ def battle(player):
   if enemy.health <= 0:
     input("Damn fine fightin'")
     player.loot(enemy)
-    while True:
-        play_again = input(("You've had {} battle(s)\nDo you want to play again?").format(battle_count))
-        if play_again not in ("y","n","yes","no"):
-            print("What was that? I can't hear incorrect inputs\n")
-            continue
-        else:
-            break
-    return player, play_again, battle_count
+    return player
   else:
-    print("Didn't get here yet")
+    play_again = "n"
+    return play_again
 
 battle_count = 0
 play_again = "y"
 
 while battle_count < 3:
-    if play_again in ("y","yes"):
-        battle_count += 1
-        battle(player)
-        continue
-    if play_again in ("n","no"):
+  battle_count += 1
+  battle(player)
+  while True:
+        play_again = input(("You've had {} battle(s)\nDo you want to play again?").format(battle_count))
+        if play_again not in ("y","n","yes","no"):
+            print("What was that? I can't hear incorrect inputs\n")
+            continue
         break
+  if play_again in ("n","no"):
+    break
+  continue
+  
+    
 input("All done already?")
 
 
