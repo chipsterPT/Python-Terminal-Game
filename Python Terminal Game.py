@@ -89,6 +89,9 @@ class Player:
       if choice == "done":
         break
 
+  #def exp_gain(self, enemy):
+    
+
 class Monster:
   def __init__(self, role, level, special):
     self.role = role
@@ -128,7 +131,6 @@ class Monster:
 player_name = input("Enter player name, then hit Enter.\n")
 
 player_role = input("What type of fighter are you?\nArcher, Warrior, or Mage\n").lower()
-
 #checking to see if user follows directions
 while True:
   if player_role not in ("archer", "warrior", "mage"):
@@ -139,15 +141,14 @@ while True:
     break
 
 player_weapon = random.choice(list(weapon_types.keys()))
-
 player = Player(player_name, player_role, player_weapon)
-
-input()
-print(("Hey look, a {} is just lying here. \nNow it's your weapon.").format(player.weapon))
 current_weapon_type = weapon_types.get(player.weapon)
 input()
-fight_question = input("Ready to pick a fight?\nY/N:\n")
 
+print(("Hey look, a {} is just lying here. \nNow it's your weapon.").format(player.weapon))
+input()
+
+fight_question = input("Ready to pick a fight?\nY/N:\n")
 while True:
     if fight_question.lower() not in ("y", "n", "yes", "no"):
         fight_question = input("Not an option\nYes or no?\n")
@@ -195,8 +196,11 @@ def battle(player):
         return player, enemy
       return player, enemy
   input(enemy)
-  enemy.health = 3
+  player.health = 3
   while enemy.health > 0:
+    if player.health <= 0:
+      input(("Bad choice, the {} has beaten the crap out of you\nYou feel as though you're leaving the battle function...").format(enemy.role))
+      break
     atk_or_run = input("Attack or run?\n").lower()
     if atk_or_run not in ("attack", "run"):
       print("Try again.\n")
@@ -214,7 +218,7 @@ def battle(player):
     return player
   else:
     play_again = "n"
-    return play_again
+    return player, play_again
 
 battle_count = 0
 play_again = "y"
@@ -222,6 +226,9 @@ play_again = "y"
 while battle_count < 3:
   battle_count += 1
   battle(player)
+  if player.health <= 0:
+    input()
+    break
   while True:
         play_again = input(("You've had {} battle(s)\nDo you want to play again?").format(battle_count))
         if play_again not in ("y","n","yes","no"):
