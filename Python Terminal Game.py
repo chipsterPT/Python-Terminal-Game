@@ -20,6 +20,7 @@ class Player:
     self.level = level
     self.health = level *10
     self.max_health = level *10
+    self.exp = 0
 
   def __repr__(self):
     return "{}, a level {} {}, has {} health left.".format(self.name, self.level, self.role, self.health)
@@ -58,38 +59,30 @@ class Player:
 
   def loot(self, enemy):
     choice = input("Do you want to loot the loser or take it easy and rest? (Loot or rest):  ").lower()
-    loot_or_rest = 1
-    while loot_or_rest == 1:
-      if choice not in ("loot", "rest"):
-        choice = input("You think you're clever, with your free will. Choose loot or rest:  ")
-        continue
-      if choice == "rest":
-        input("You calmly took a breath")
-        input(("You've been fully restored to {} health").format(self.max_health))
-        self.health = self.max_health
-        loot_or_rest = 2
-      if choice == "loot":
-        input("You quickly scan the loser")
-        possible_weapon =  random.choice(list(weapon_types.keys()))
-        weapon_choice = input(("Looks like this {} was using a {}, though clearly not well. Do you want it?\n").format(enemy.role, possible_weapon)).lower()
-        while loot_or_rest == 1:
-          if weapon_choice not in ("y","n","yes","no"):
-            weapon_choice = input("Just looking for yes or no, dude.  ").lower()
-            continue
-          if weapon_choice in ("y", "yes"):
-            self.weapon = possible_weapon
-            input(("You look bitchin with your new {}! Let's try it out.").format(self.weapon))
-            loot_or_rest = 2
-            break
-          if weapon_choice in ("n", "no"):
-            input(("Good call, you look better with your {} anyway. Let's continue.").format(self.weapon))
-            loot_or_rest = 2
-            break
+    while choice not in ("loot", "rest"):
+      choice = input("You think you're clever, with your free will. Choose loot or rest:  ")
+    if choice == "rest":
+      input("You calmly took a breath")
+      input(("You've been fully restored to {} health").format(self.max_health))
+      self.health = self.max_health
+      return player
+    if choice == "loot":
+      input("You quickly scan the loser")
+      possible_weapon =  random.choice(list(weapon_types.keys()))
+      weapon_choice = input(("Looks like this {} was using a {}, though clearly not well. Do you want it?\n").format(enemy.role, possible_weapon)).lower()
+      while weapon_choice not in ("y","n","yes","no"):
+        weapon_choice = input("Just looking for yes or no, dude.  ").lower()
+      if weapon_choice in ("y", "yes"):
+        self.weapon = possible_weapon
+        input(("You look bitchin with your new {}! Let's try it out.").format(self.weapon))
+      if weapon_choice in ("n", "no"):
+        input(("Good call, you look better with your {} anyway. Let's continue.").format(self.weapon))
         choice = "done"
-      if choice == "done":
-        break
+      return player
 
-  #def exp_gain(self, enemy):
+  # def exp_gain(self, enemy):
+  #   nxt_lvl = self.level * 2
+
     
 
 class Monster:
@@ -132,13 +125,9 @@ player_name = input("Enter player name, then hit Enter.\n")
 
 player_role = input("What type of fighter are you?\nArcher, Warrior, or Mage\n").lower()
 #checking to see if user follows directions
-while True:
-  if player_role not in ("archer", "warrior", "mage"):
-    player_role = input("I don't think that's a real thing. What is it similar to:\n Archer, Warrior, or Mage?\n").lower()
-    continue
-  else:
-    print(("Ah, {}, the mighty {} I've heard nothing about.").format(player_name, player_role))
-    break
+while player_role not in ("archer", "warrior", "mage"):
+  player_role = input("I don't think that's a real thing. What is it similar to:\n Archer, Warrior, or Mage?\n").lower()
+print(("Ah, {}, the mighty {} I've heard nothing about.").format(player_name, player_role))
 
 player_weapon = random.choice(list(weapon_types.keys()))
 player = Player(player_name, player_role, player_weapon)
@@ -149,18 +138,14 @@ print(("Hey look, a {} is just lying here. \nNow it's your weapon.").format(play
 input()
 
 fight_question = input("Ready to pick a fight?\nY/N:\n")
-while True:
-    if fight_question.lower() not in ("y", "n", "yes", "no"):
-        fight_question = input("Not an option\nYes or no?\n")
-        continue
-    if fight_question.lower() in ("y", "yes"):
-        print("Great! I see some losers over there, let's go.")
-        input()
-        break
-    if fight_question.lower() in ("n", "no"):
-        print("Too bad. Should have thought about that before running this program. Let's go.")
-        input()
-        break
+while fight_question.lower() not in ("y", "n", "yes", "no"):
+  fight_question = input("Not an option\nYes or no?\n")
+if fight_question.lower() in ("y", "yes"):
+  print("Great! I see some losers over there, let's go.")
+  input()
+if fight_question.lower() in ("n", "no"):
+  print("Too bad. Should have thought about that before running this program. Let's go.")
+  input()
 
 def battle(player):
   enemy = Monster(random.choice(list((role_types.keys()))), player.level, random.choice(list((special_qualities))))
@@ -202,16 +187,13 @@ def battle(player):
       input(("Bad choice, the {} has beaten the crap out of you\nYou feel as though you're leaving the battle function...").format(enemy.role))
       break
     atk_or_run = input("Attack or run?\n").lower()
-    if atk_or_run not in ("attack", "run"):
+    while atk_or_run not in ("attack", "run"):
       print("Try again.\n")
-      continue
     if atk_or_run == "attack":
       attack_sequence(player, enemy)
-      continue
     if atk_or_run == "run":
       input("Good call, you suck")
       input("Just kidding, I love you\nThanks for playing this")
-      break
   if enemy.health <= 0:
     input("Damn fine fightin'")
     player.loot(enemy)
