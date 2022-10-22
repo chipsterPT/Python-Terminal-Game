@@ -80,10 +80,19 @@ class Player:
         choice = "done"
       return player
 
-  # def exp_gain(self, enemy):
-  #   nxt_lvl = self.level * 2
-
-    
+  def exp_gain(self, enemy):
+    nxt_lvl = self.level * 2
+    self.exp += enemy.level
+    input(("You gained {} exp").format(enemy.level))
+    if self.exp >= nxt_lvl:
+      self.level +=1
+      self.exp -= nxt_lvl
+      self.max_health = self.level *10
+      input(("You leveled up! Not sure what that means, but you're now level {}").format(self.level))
+      return player
+    else:
+      input(("Just {} exp until you level up").format(nxt_lvl - self.exp))
+      return player
 
 class Monster:
   def __init__(self, role, level, special):
@@ -181,7 +190,7 @@ def battle(player):
         return player, enemy
       return player, enemy
   input(enemy)
-  player.health = 3
+  enemy.health = 3
   while enemy.health > 0:
     if player.health <= 0:
       input(("Bad choice, the {} has beaten the crap out of you\nYou feel as though you're leaving the battle function...").format(enemy.role))
@@ -196,8 +205,9 @@ def battle(player):
       input("Just kidding, I love you\nThanks for playing this")
   if enemy.health <= 0:
     input("Damn fine fightin'")
+    player.exp_gain(enemy)
     player.loot(enemy)
-    return player
+    return player, enemy
   else:
     play_again = "n"
     return player, play_again
@@ -212,7 +222,7 @@ while battle_count < 3:
     input()
     break
   while True:
-        play_again = input(("You've had {} battle(s)\nDo you want to play again?").format(battle_count))
+        play_again = input(("You've had {} battle(s)\nDo you want to play again?\n").format(battle_count))
         if play_again not in ("y","n","yes","no"):
             print("What was that? I can't hear incorrect inputs\n")
             continue
@@ -225,4 +235,4 @@ while battle_count < 3:
 input("All done already?")
 
 
-#exp and limit on battles/some sort of endgame needed
+#enemy specials and limit on battles/some sort of endgame needed
