@@ -82,8 +82,8 @@ class Player:
 
   def exp_gain(self, enemy):
     nxt_lvl = self.level * 2
-    self.exp += enemy.level
-    input(("You gained {} exp").format(enemy.level))
+    self.exp += round((enemy.level * 1.4))
+    input(("You gained {} exp").format(round((enemy.level * 1.4))))
     if self.exp >= nxt_lvl:
       self.level +=1
       self.exp -= nxt_lvl
@@ -126,10 +126,15 @@ class Monster:
     attack_power = self.level * advantage
     return attack_power
   
-  #def poison(self, player):
+  def poison(self, player):
+    player.health -= round(self.level * 1.4)
+    return player
 
-  #def heal(self):
-    
+  def heal(self):
+    self.health += self.level
+    return self
+
+
 player_name = input("Enter player name, then hit Enter.\n")
 
 player_role = input("What type of fighter are you?\nArcher, Warrior, or Mage\n").lower()
@@ -198,8 +203,13 @@ def battle(player):
     atk_or_run = input("Attack or run?\n").lower()
     while atk_or_run not in ("attack", "run"):
       print("Try again.\n")
+      atk_or_run = input("Attack or run?\n").lower()
     if atk_or_run == "attack":
       attack_sequence(player, enemy)
+      if enemy.special == "poisonous":
+        enemy.poison(player)
+      if enemy.special =="able to heal itself":
+        enemy.heal()
     if atk_or_run == "run":
       input("Good call, you suck")
       input("Just kidding, I love you\nThanks for playing this")
