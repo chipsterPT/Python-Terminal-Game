@@ -4,7 +4,8 @@ weapon_types = {"stick":["melee", "magic"], "staff":"magic", "sword":"melee", "s
 
 role_types = {"archer":"ranged", "warrior":"melee", "mage":"magic"}
 
-special_qualities = ["poisonous", "superduper fast", "able to heal itself"]
+special_qualities = ["poisonous", "superduper fast", "able to heal themself"]
+special_qualities = ["poisonous", "able to heal themself"]
 
 adjectives = ["juicy", "hangry", "gorgeous", "gross af", "frickin stupid", "John Stamos-looking", "run-of-the-mill"]
 
@@ -128,13 +129,16 @@ class Monster:
   
   def poison(self, player):
     player.health -= round(self.level * 1.4)
+    input(("The {}'s poisoned weapon stings again.\nYou have {} health left").format(self.role, player.health))
     return player
 
   def heal(self):
     self.health += self.level
+    input(("The {} healed itself to {} health").format(self.role,self.health))
     return self
 
 
+print("Special qualities changed")
 player_name = input("Enter player name, then hit Enter.\n")
 
 player_role = input("What type of fighter are you?\nArcher, Warrior, or Mage\n").lower()
@@ -163,7 +167,9 @@ if fight_question.lower() in ("n", "no"):
 
 def battle(player):
   enemy = Monster(random.choice(list((role_types.keys()))), player.level, random.choice(list((special_qualities))))
-
+  if battle_count ==1:
+    enemy.special = "poisonous"
+    enemy.health = 5
   def attack_sequence(player, enemy):
       if enemy.special == "superduper fast":
         bad = round(enemy.attack(player))
@@ -175,44 +181,48 @@ def battle(player):
           input()
         good = round(player.attack(enemy))
         enemy.health -= good
-        print(("You damaged the {} for {} health.\nThey have {} health remaining.").format(enemy.role, good, enemy.health))
-        input()
+        print(("\nYou damaged the {} for {} health.").format(enemy.role, good))
+        if enemy.health <= 0:
+            return player, enemy
+        input(("They have {} health remaining").format(enemy.health))
         return player, enemy
       else:
         good = round(player.attack(enemy))
         enemy.health -= good
-        print(("\nYou damaged the {} for {} health.\nThey have {} health remaining.").format(enemy.role, good, enemy.health))
-        input()
+        print(("\nYou damaged the {} for {} health.").format(enemy.role, good))
+        if enemy.health <= 0:
+            return player, enemy
+        input(("They have {} health remaining").format(enemy.health))
         bad = round(enemy.attack(player))
         player.health -= bad
         if player.health <= 0:
             return "You lose"
-        if enemy.health <= 0:
-            return player, enemy
+        
         else:
           print(("It attacked! You lost {} health.\nYou have {} health remaining.").format(bad, player.health))
           input()
         return player, enemy
       return player, enemy
   input(enemy)
-  enemy.health = 3
   while enemy.health > 0:
     if player.health <= 0:
       input(("Bad choice, the {} has beaten the crap out of you\nYou feel as though you're leaving the battle function...").format(enemy.role))
       break
     atk_or_run = input("Attack or run?\n").lower()
-    while atk_or_run not in ("attack", "run"):
+    while atk_or_run not in ("attack", "run", "a", "r"):
       print("Try again.\n")
       atk_or_run = input("Attack or run?\n").lower()
-    if atk_or_run == "attack":
+    if atk_or_run in("a", "attack"):
       attack_sequence(player, enemy)
-      if enemy.special == "poisonous":
-        enemy.poison(player)
-      if enemy.special =="able to heal itself":
-        enemy.heal()
-    if atk_or_run == "run":
+      if enemy.health > 0:
+        if enemy.special == "poisonous":
+          enemy.poison(player)
+        if enemy.special =="able to heal themself":
+          enemy.heal()
+    if atk_or_run in ("r", "run"):
       input("Good call, you suck")
       input("Just kidding, I love you\nThanks for playing this")
+      break
   if enemy.health <= 0:
     input("Damn fine fightin'")
     player.exp_gain(enemy)
@@ -245,4 +255,4 @@ while battle_count < 3:
 input("All done already?")
 
 
-#enemy specials and limit on battles/some sort of endgame needed
+#enemy initial health and health scaling and limit on battles/some sort of endgame needed
