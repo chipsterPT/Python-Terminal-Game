@@ -5,13 +5,13 @@ weapon_types = {"stick":["melee", "magic"], "staff":"magic", "sword":"melee", "s
 role_types = {"archer":"ranged", "warrior":"melee", "mage":"magic"}
 
 special_qualities = ["poisonous", "superduper fast", "able to heal themself"]
-special_qualities = ["poisonous", "able to heal themself"]
 
 adjectives = ["juicy", "hangry", "gorgeous", "gross af", "frickin stupid", "John Stamos-looking", "run-of-the-mill"]
 
 # Warrior > Mage
 # Archer > Warrior
 # Mage > Archer
+advantage_dict = {"warrior":"mage","archer":"warrior","mage":"archer"}
 
 class Player:
   def __init__(self, name, role, weapon, level=1):
@@ -31,26 +31,34 @@ class Player:
     advantage = 1
     current_weapon_type = weapon_types.get(self.weapon)
     # Role v role advantage
-    if self.role == "warrior" and enemy.role == "mage":
+    if advantage_dict[self.role] == enemy.role:
       advantage+=1
-    if self.role == "archer" and enemy.role == "warrior":
-      advantage+=1
-    if self.role == "mage" and enemy.role == "archer":
-      advantage+=1
+    # if self.role == "warrior" and enemy.role == "mage":
+    #   advantage+=1
+    # if self.role == "archer" and enemy.role == "warrior":
+    #   advantage+=1
+    # if self.role == "mage" and enemy.role == "archer":
+    #   advantage+=1
     # Role v role disadvantage
-    if self.role == "warrior" and enemy.role == "archer":
+    if advantage_dict[enemy.role] == self.role:
       advantage = advantage * .75
-    if self.role == "archer" and enemy.role == "mage":
-      advantage = advantage * .75
-    if self.role == "mage" and enemy.role == "warrior":
-      advantage = advantage * .75
+    # if self.role == "warrior" and enemy.role == "archer":
+    #   advantage = advantage * .75
+    # if self.role == "archer" and enemy.role == "mage":
+    #   advantage = advantage * .75
+    # if self.role == "mage" and enemy.role == "warrior":
+    #   advantage = advantage * .75
     # Weapon v role advantage
-    if current_weapon_type == "warrior" and enemy.role == "mage":
-      advantage+=1
-    if current_weapon_type == "archer" and enemy.role == "warrior":
-      advantage+=1
-    if current_weapon_type == "mage" and enemy.role == "archer":
-      advantage+=1
+    for type in current_weapon_type:
+      t2r = [role for role,type in role_types.items() if type == ]
+      if advantage_dict[type] == enemy.role:
+        advantage+=1
+    # if current_weapon_type == "warrior" and enemy.role == "mage":
+    #   advantage+=1
+    # if current_weapon_type == "archer" and enemy.role == "warrior":
+    #   advantage+=1
+    # if current_weapon_type == "mage" and enemy.role == "archer":
+    #   advantage+=1
     # Role and weapon compatibility
     if role_types.get(self.role) in current_weapon_type:
       advantage+=1
@@ -99,8 +107,8 @@ class Monster:
   def __init__(self, role, level, special):
     self.role = role
     self.level = level
-    self.health = level *9
-    self.max_health = level *9
+    self.health = level *7
+    self.max_health = level *7
     self.special = special
     
   def __repr__(self):
@@ -128,7 +136,7 @@ class Monster:
     return attack_power
   
   def poison(self, player):
-    player.health -= round(self.level * 1.4)
+    player.health -= self.level
     input(("The {}'s poisoned weapon stings again.\nYou have {} health left").format(self.role, player.health))
     return player
 
@@ -137,8 +145,7 @@ class Monster:
     input(("The {} healed itself to {} health").format(self.role,self.health))
     return self
 
-
-print("Special qualities changed")
+input("I'm not a game designer, but this practice game for Codecademy is basically Dark Souls")
 player_name = input("Enter player name, then hit Enter.\n")
 
 player_role = input("What type of fighter are you?\nArcher, Warrior, or Mage\n").lower()
@@ -167,8 +174,9 @@ if fight_question.lower() in ("n", "no"):
 
 def battle(player):
   enemy = Monster(random.choice(list((role_types.keys()))), player.level, random.choice(list((special_qualities))))
+  enemy.special = "able to heal themself"
   if battle_count ==1:
-    enemy.special = "poisonous"
+    enemy.role = player.role
     enemy.health = 5
   def attack_sequence(player, enemy):
       if enemy.special == "superduper fast":
@@ -204,6 +212,7 @@ def battle(player):
         return player, enemy
       return player, enemy
   input(enemy)
+  turn_count=0
   while enemy.health > 0:
     if player.health <= 0:
       input(("Bad choice, the {} has beaten the crap out of you\nYou feel as though you're leaving the battle function...").format(enemy.role))
@@ -213,11 +222,12 @@ def battle(player):
       print("Try again.\n")
       atk_or_run = input("Attack or run?\n").lower()
     if atk_or_run in("a", "attack"):
+      turn_count+=1
       attack_sequence(player, enemy)
       if enemy.health > 0:
         if enemy.special == "poisonous":
           enemy.poison(player)
-        if enemy.special =="able to heal themself":
+        if (enemy.special =="able to heal themself") & (turn_count%2==0):
           enemy.heal()
     if atk_or_run in ("r", "run"):
       input("Good call, you suck")
@@ -251,8 +261,13 @@ while battle_count < 3:
     break
   continue
   
-    
+def final_battle(player):
+  boss = Monster(role, level, special)
+
+
 input("All done already?")
 
 
-#enemy initial health and health scaling and limit on battles/some sort of endgame needed
+#limit on battles/some sort of endgame needed
+#need to fix weapon v role compatibiltiy, get rid of weapon type/role conversion
+#update enemy attack advantage
