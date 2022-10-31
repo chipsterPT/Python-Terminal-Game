@@ -1,8 +1,6 @@
 import random
 
-weapon_types = {"stick":["melee", "magic"], "staff":"magic", "sword":"melee", "spear":["melee", "ranged"], "bow":"ranged", "gun":["magic", "ranged"]}
-
-role_types = {"archer":"ranged", "warrior":"melee", "mage":"magic"}
+weapon_types = {"stick":["warrior", "mage"], "staff":["mage"], "sword":["warrior"], "spear":["warrior", "archer"], "bow":["archer"], "gun":["mage", "archer"]}
 
 special_qualities = ["poisonous", "superduper fast", "able to heal themself"]
 
@@ -50,8 +48,7 @@ class Player:
     #   advantage = advantage * .75
     # Weapon v role advantage
     for type in current_weapon_type:
-      t2r = [role for role,type in role_types.items() if type == ]
-      if advantage_dict[type] == enemy.role:
+      if enemy.role in advantage_dict[type]:
         advantage+=1
     # if current_weapon_type == "warrior" and enemy.role == "mage":
     #   advantage+=1
@@ -60,7 +57,7 @@ class Player:
     # if current_weapon_type == "mage" and enemy.role == "archer":
     #   advantage+=1
     # Role and weapon compatibility
-    if role_types.get(self.role) in current_weapon_type:
+    if self.role in current_weapon_type:
       advantage+=1
     # Attack power result
     attack_power = self.level * advantage
@@ -117,26 +114,16 @@ class Monster:
   def attack(self, player):
     attack_power = 0
     advantage = 1
-    # Role v role advantage
-    if self.role == "warrior" and player.role == "mage":
+    if advantage_dict[self.role] == player.role:
       advantage+=1
-    if self.role == "archer" and player.role == "warrior":
-      advantage+=1
-    if self.role == "mage" and player.role == "archer":
-      advantage+=1
-    # Role v role disadvantage
-    if self.role == "warrior" and player.role == "archer":
-      advantage = advantage * .75
-    if self.role == "archer" and player.role == "mage":
-      advantage = advantage * .75
-    if self.role == "mage" and player.role == "warrior":
+    if advantage_dict[player.role] == self.role:
       advantage = advantage * .75
     # Attack power result
     attack_power = self.level * advantage
     return attack_power
   
   def poison(self, player):
-    player.health -= self.level
+    player.health -= round((self.level+1)/2)
     input(("The {}'s poisoned weapon stings again.\nYou have {} health left").format(self.role, player.health))
     return player
 
@@ -173,11 +160,10 @@ if fight_question.lower() in ("n", "no"):
   input()
 
 def battle(player):
-  enemy = Monster(random.choice(list((role_types.keys()))), player.level, random.choice(list((special_qualities))))
-  enemy.special = "able to heal themself"
-  if battle_count ==1:
+  enemy = Monster(random.choice(list((advantage_dict.keys()))), player.level, random.choice(list((special_qualities))))
+  if battle_count == 1 or 2:
     enemy.role = player.role
-    enemy.health = 5
+    enemy.health = 4
   def attack_sequence(player, enemy):
       if enemy.special == "superduper fast":
         bad = round(enemy.attack(player))
@@ -245,7 +231,7 @@ def battle(player):
 battle_count = 0
 play_again = "y"
 
-while battle_count < 3:
+while battle_count < 4:
   battle_count += 1
   battle(player)
   if player.health <= 0:
@@ -262,12 +248,68 @@ while battle_count < 3:
   continue
   
 def final_battle(player):
-  boss = Monster(role, level, special)
+  enemy = Monster(role=advantage_dict[player.role], level=(player.level-1), special="superduper fast")
+  enemy.health = 30
+  def attack_sequence(player, enemy):
+      if enemy.special == "superduper fast":
+        bad = round(enemy.attack(player))
+        player.health -= bad
+        if player.health <= 0:
+          return "You lose"
+        else:
+          print(("\nIt's wicked fast! You lost {} health.\nYou have {} health remaining.").format(bad, player.health))
+          input()
+        good = round(player.attack(enemy))
+        enemy.health -= good
+        print(("\nYou damaged the {} for {} health.").format(enemy.role, good))
+        if enemy.health <= 0:
+            return player, enemy
+        input(("They have {} health remaining").format(enemy.health))
+        return player, enemy
+      else:
+        good = round(player.attack(enemy))
+        enemy.health -= good
+        print(("\nYou damaged the {} for {} health.").format(enemy.role, good))
+        if enemy.health <= 0:
+            return player, enemy
+        input(("They have {} health remaining").format(enemy.health))
+        bad = round(enemy.attack(player))
+        player.health -= bad
+        if player.health <= 0:
+            return "You lose"
+        
+        else:
+          print(("It attacked! You lost {} health.\nYou have {} health remaining.").format(bad, player.health))
+          input()
+        return player, enemy
+      return player, enemy
+  input(("Uh oh, you pissed off someone.\nThat {} looks terrifyingly cunning.").format(enemy.role))
+  turn_count=0
+  while enemy.health > 0:
+    if player.health <= 0:
+      input(("Bad choice, the {} has beaten the crap out of you\nYou feel as though you're leaving the battle function...").format(enemy.role))
+      break
+    atk_or_run = input("Attack or run?\n").lower()
+    while atk_or_run not in ("attack", "run", "a", "r"):
+      print("Try again.\n")
+      atk_or_run = input("Attack or run?\n").lower()
+    if atk_or_run in("a", "attack"):
+      turn_count+=1
+      attack_sequence(player, enemy)
+      enemy.poison(player)
+    if atk_or_run in ("r", "run"):
+      input("Good call, you suck")
+      input("Just kidding, I love you\nThanks for playing this")
+      break
+  if enemy.health <= 0:
+    input("Huh, you did it. I think you've beaten everyone\nGoodbye")
+    return player, enemy
+  else:
+    play_again = "n"
+    return player, play_again
 
-
+final_battle(player)
 input("All done already?")
 
 
-#limit on battles/some sort of endgame needed
-#need to fix weapon v role compatibiltiy, get rid of weapon type/role conversion
-#update enemy attack advantage
+#fix what happens when you suck
